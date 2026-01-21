@@ -8,14 +8,14 @@
   </head>
   <body>
     <div style="width: 30%; height:80%; padding: 100px; margin: auto; margin-top: 100px;">
-        <form>
+        <form aciton="/login" method="POST">
             <div class="mb3">
-                <label for="exampleInputEmail1" class="form-label">Lietotājvārds</label>
-                <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+                <label for="exampleInputUsername1" class="form-label">Lietotājvārds</label>
+                <input type="text" class="form-control" id="exampleInputUsername1" name="lietotajvards">
             </div>
             <div class="mb-3">
                 <label for="exampleInputPassword1" class="form-label">Parole</label>
-                <input type="password" class="form-control" id="exampleInputPassword1">
+                <input type="password" class="form-control" id="exampleInputPassword1" name="parole">
             </div>
             <button type="submit" class="btn btn-primary">Pieslēgties</button>
         </form>
