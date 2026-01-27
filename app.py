@@ -1,7 +1,10 @@
 from flask import Flask, render_template, request, redirect, url_for, session
+from cs50 import SQL
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "parole123"
+
+db = SQL("sqlite:///datubaze.db")
 
 @app.route("/", methods=["GET", "POST"])
 def index():
@@ -14,12 +17,20 @@ def index():
 def login():
     if request.method == "GET":
         return render_template("login.html")
+
     elif request.method == "POST":
         lietotajvards = request.form.get("lietotajvards")
         parole = request.form.get("parole")
         
-        user_id = 1 # TODO nomainit lai iegust no datubazes
-
+        lietotajs = db.execute("SELECT * FROM lietotaji WHERE lietotajvards=? AND parole=?;", lietotajvards, parole)
+        
+        if lietotajs:
+            print(lietotajs)
+            user_id = lietotajs[0]["id"]
+        else:
+            print("Error")
+            return redirect("/register")
+            
         session["user_id"] = user_id
                 
         return redirect("/")
@@ -28,7 +39,27 @@ def login():
 def register():
     if request.method == "GET":
         return render_template("register.html")
+    
     elif request.method == "POST":
+        lietotajvards = request.form.get("lietotajvards")
+        parole = request.form.get("parole")
+        apst_parole = request.form.get("apst-parole")
+        
+        if parole != apst_parole:
+            print("paroles nesakrit")
+            return redirect("/register")
+        
+        lietotajs = db.execute("SELECT * FROM lietotaji WHERE lietotajvards=?", lietotajvards)
+        
+        if lietotajs:
+            print("Lietotajvards aiznemts!")
+            return redirect("/register")
+        else:
+            result = db.execute("INSERT INTO lietotaji(lietotajvards, parole) VALUES(?, ?);", lietotajvards, parole)
+            
+        if result:
+            session["user_id"] = result
+        
         return redirect("/")
         
 
