@@ -6,6 +6,29 @@ app.config["SECRET_KEY"] = "parole123"
 
 db = SQL("sqlite:///datubaze.db")
 
+class UserService():
+    def __init__(self, db):
+        self.db = db
+
+    def autentificet(self, lietotajvards, parole):
+        lietotaji = self.db.execute(
+            "SELECT * FROM lietotaji WHERE lietotajvards=? AND parole=?",
+            lietotajvards, parole
+        )
+        return lietotaji[0] if lietotaji else None
+    
+    def lietotajs_eksiste(self, lietotajvards):
+        return self.db.execute(
+            "SELECT * FROM lietotaji WHERE lietotajvards=?",
+            lietotajvards
+        )
+        
+    def izveidot_lietotaju(self, lietotajvards, parole):
+        return self.db.execute(
+            "INSERT INTO lietotaji(lietotajvards, parole) VALUES(?, ?)",
+            lietotajvards, parole
+        )   
+
 @app.route("/", methods=["GET", "POST"])
 def index():
     if "user_id" in session:
