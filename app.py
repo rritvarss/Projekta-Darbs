@@ -1,33 +1,34 @@
 from flask import Flask, render_template, request, redirect, url_for, session
 from cs50 import SQL
+import hashlib
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "parole123"
 
 db = SQL("sqlite:///datubaze.db")
 
-class UserService():
-    def __init__(self, db):
-        self.db = db
+# class UserService():
+#     def __init__(self, db):
+#         self.db = db
 
-    def autentificet(self, lietotajvards, parole):
-        lietotaji = self.db.execute(
-            "SELECT * FROM lietotaji WHERE lietotajvards=? AND parole=?",
-            lietotajvards, parole
-        )
-        return lietotaji[0] if lietotaji else None
+#     def autentificet(self, lietotajvards, parole):
+#         lietotaji = self.db.execute(
+#             "SELECT * FROM lietotaji WHERE lietotajvards=? AND parole=?",
+#             lietotajvards, parole
+#         )
+#         return lietotaji[0] if lietotaji else None
     
-    def lietotajs_eksiste(self, lietotajvards):
-        return self.db.execute(
-            "SELECT * FROM lietotaji WHERE lietotajvards=?",
-            lietotajvards
-        )
+#     def lietotajs_eksiste(self, lietotajvards):
+#         return self.db.execute(
+#             "SELECT * FROM lietotaji WHERE lietotajvards=?",
+#             lietotajvards
+#         )
         
-    def izveidot_lietotaju(self, lietotajvards, parole):
-        return self.db.execute(
-            "INSERT INTO lietotaji(lietotajvards, parole) VALUES(?, ?)",
-            lietotajvards, parole
-        )   
+#     def izveidot_lietotaju(self, lietotajvards, parole):
+#         return self.db.execute(
+#             "INSERT INTO lietotaji(lietotajvards, parole) VALUES(?, ?)",
+#             lietotajvards, parole
+#         )   
 
 @app.route("/", methods=["GET", "POST"])
 def index():
@@ -44,8 +45,9 @@ def login():
     elif request.method == "POST":
         lietotajvards = request.form.get("lietotajvards")
         parole = request.form.get("parole")
+        hashed_parole = hashlib.md5(parole.encode("utf-8")).hexdigest()
         
-        lietotajs = db.execute("SELECT * FROM lietotaji WHERE lietotajvards=? AND parole=?;", lietotajvards, parole)
+        lietotajs = db.execute("SELECT * FROM lietotaji WHERE lietotajvards=? AND parole=?;", lietotajvards, hashed_parole)
         
         if lietotajs:
             print(lietotajs)
@@ -78,7 +80,10 @@ def register():
             print("Lietotajvards aiznemts!")
             return redirect("/register")
         else:
-            result = db.execute("INSERT INTO lietotaji(lietotajvards, parole) VALUES(?, ?);", lietotajvards, parole)
+            result = db.execute(
+                "INSERT INTO lietotaji(lietotajvards, parole) VALUES(?, ?);",
+                lietotajvards,
+                hashlib.md5(parole.encode("utf-8")).hexdigest())
             
         if result:
             session["user_id"] = result
