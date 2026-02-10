@@ -32,6 +32,31 @@ class UserService():
         
 userService = UserService(db)
 
+class App:
+    def __init__(self):
+        self.app = Flask(__name__)
+        self.app.config["SECRET_KEY"] = "parole123"
+
+        self.db = SQL("sqlite:///datubaze.db")
+        self.user_service = UserService(self.db)
+        
+        self.routes()
+        
+    def routes(self):
+        self.app.add_url_rule("/", view_func=self.index, methods=["GET", "POST"])
+        
+    def index(self):
+        pass
+    
+    def login(self):
+        pass
+    
+    def register(self):
+        pass
+    
+    def logout(self):
+        pass
+
 @app.route("/", methods=["GET", "POST"])
 def index():
     if "user_id" in session:
