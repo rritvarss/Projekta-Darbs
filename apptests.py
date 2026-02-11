@@ -60,7 +60,7 @@ def index():
     
 @app.route("/login", methods=["GET", "POST"])
 def login():
-    if request.method == "GET":
+   if request.method == "GET":
         if "user_id" in session:
             return redirect("/")
             
